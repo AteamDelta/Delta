@@ -11,6 +11,8 @@ namespace Ateam
         Dictionary<int, Common.MOVE_TYPE> Dir;
         Dictionary<int, Vector2> OldPos;
 
+        List<Vector2> ItemPos;
+
         //---------------------------------------------------
         // InitializeAI
         //---------------------------------------------------
@@ -20,6 +22,7 @@ namespace Ateam
             Enemys = new Dictionary<int, CharacterModel.Data>();
             Dir = new Dictionary<int, Common.MOVE_TYPE>();
             OldPos = new Dictionary<int, Vector2>();
+            ItemPos = new List<Vector2>();
 
             //データ取得
             var PlayerDataList = GetTeamCharacterDataList(TEAM_TYPE.PLAYER);
@@ -103,6 +106,107 @@ namespace Ateam
                 }
             }
 
+            //アイテム取得
+            foreach(var item in ItemPos)
+            {
+                bool bget = false;
+                float itemlen = 20.0f;
+                int id = -1;
+
+                foreach (var player in PlayerDataList)
+                {
+                    //アイテム取得
+                    if (player.BlockPos == item)
+                    {
+                        ItemPos.Remove(item);
+                        bget = true;
+                        break;
+                    }
+
+                    //範囲
+                    float range = 0.0f;
+                    if (player.BlockPos.y < item.y)
+                    {
+                        range += item.y - player.BlockPos.y;
+                    }
+                    if (player.BlockPos.y > item.y)
+                    {
+                        range += player.BlockPos.y - item.y;
+                    }
+                    if (player.BlockPos.x < item.x)
+                    {
+                        range += item.x - player.BlockPos.x;
+                    }
+                    if (player.BlockPos.x > item.x)
+                    {
+                        range += player.BlockPos.x - item.x;
+                    }
+
+                    if( range < itemlen)
+                    {
+                        itemlen = range;
+                        id = player.ActorId;
+                    }
+                }
+
+                if( id != -1)
+                {
+                    var player = GetCharacterData(id);
+                    //最短距離
+                    if (player.BlockPos.y < item.y && (int)player.BlockPos.y + 1 < 15 &&
+                        StageData[(int)player.BlockPos.y + 1, (int)player.BlockPos.x] == 0)
+                    {
+                        Move(player.ActorId, Common.MOVE_TYPE.UP);
+                    }
+                    else if (player.BlockPos.y > item.y && (int)player.BlockPos.y - 1 > -1 &&
+                        StageData[(int)player.BlockPos.y - 1, (int)player.BlockPos.x] == 0)
+                    {
+                        Move(player.ActorId, Common.MOVE_TYPE.DOWN);
+
+                    }
+
+                    else if (player.BlockPos.x < item.x && (int)player.BlockPos.x + 1 < 15 &&
+                        StageData[(int)player.BlockPos.y, (int)player.BlockPos.x + 1] == 0)
+                    {
+                        Move(player.ActorId, Common.MOVE_TYPE.RIGHT);
+                    }
+
+                    else if (player.BlockPos.x > item.x && (int)player.BlockPos.x - 1 > -1 &&
+                        StageData[(int)player.BlockPos.y, (int)player.BlockPos.x - 1] == 0)
+                    {
+                        Move(player.ActorId, Common.MOVE_TYPE.LEFT);
+                    }
+
+                    //遠回り
+                    else if ((int)player.BlockPos.x + 1 < 15 &&
+                        StageData[(int)player.BlockPos.y, (int)player.BlockPos.x + 1] == 0)
+                    {
+                        Move(player.ActorId, Common.MOVE_TYPE.RIGHT);
+                    }
+
+                    else if ((int)player.BlockPos.x - 1 > -1 &&
+                        StageData[(int)player.BlockPos.y, (int)player.BlockPos.x - 1] == 0)
+                    {
+                        Move(player.ActorId, Common.MOVE_TYPE.LEFT);
+                    }
+                    else if ((int)player.BlockPos.y + 1 < 15 &&
+                        StageData[(int)player.BlockPos.y + 1, (int)player.BlockPos.x] == 0)
+                    {
+                        Move(player.ActorId, Common.MOVE_TYPE.UP);
+                    }
+                    else if ((int)player.BlockPos.y - 1 > -1 &&
+                        StageData[(int)player.BlockPos.y - 1, (int)player.BlockPos.x] == 0)
+                    {
+                        Move(player.ActorId, Common.MOVE_TYPE.DOWN);
+                    }
+                }
+
+                if( bget == true)
+                {
+                    break;
+                }
+            }
+
             //プレイヤー処理
             foreach (var player in PlayerDataList)
             {
@@ -118,15 +222,49 @@ namespace Ateam
                 bool bAttack = false;
                 int DangerEnemy = -1;
 
+                //範囲判定
+                bool bRangeAction = false;
+                foreach (var enemy in EnemyDataList)
+                {
+                    //範囲
+                    float range = 0.0f;
+                    if (player.BlockPos.y < enemy.BlockPos.y)
+                    {
+                        range += enemy.BlockPos.y - player.BlockPos.y;
+                    }
+                    if (player.BlockPos.y > enemy.BlockPos.y)
+                    {
+                        range += player.BlockPos.y - enemy.BlockPos.y;
+                    }
+                    if (player.BlockPos.x < enemy.BlockPos.x)
+                    {
+                        range += enemy.BlockPos.x - player.BlockPos.x;
+                    }
+                    if (player.BlockPos.x > enemy.BlockPos.x)
+                    {
+                        range += player.BlockPos.x - enemy.BlockPos.x;
+                    }
 
+                    //近いとき無敵
+                    if( range <= 7.0f)
+                    {
+                        Action(player.ActorId, Define.Battle.ACTION_TYPE.INVINCIBLE);
+                    }
+
+                    //近いとき近距離攻撃
+                    if (range <= 2.0f)
+                    {
+                        Action(player.ActorId, Define.Battle.ACTION_TYPE.ATTACK_SHORT);
+                    }
+                }
 
                 foreach (var enemy in EnemyDataList)
                 {
                     //重なり
-                    if (player.BlockPos == enemy.BlockPos)
-                    {
-                        continue;
-                    }
+                    //if (player.BlockPos == enemy.BlockPos)
+                    //{
+                    //    continue;
+                    //}
 
                     //直線上にいるか
                     //上下
@@ -136,6 +274,19 @@ namespace Ateam
                         if (player.BlockPos.y < enemy.BlockPos.y)
                         {
                             //ブロック判定
+                            bool isBlock = false;
+                            for( int nCnt = 1; nCnt < enemy.BlockPos.y - player.BlockPos.y; nCnt++)
+                            {
+                                if( StageData[ (int)player.BlockPos.y + nCnt, (int)player.BlockPos.x] == 1)
+                                {
+                                    isBlock = true;
+                                    break;
+                                }
+                            }
+                            if( isBlock == true)
+                            {
+                                continue;
+                            }
 
                             //向き合っているか
                             if( Dir[enemy.ActorId] == Common.MOVE_TYPE.DOWN)
@@ -158,6 +309,20 @@ namespace Ateam
                         //下に敵
                         if (player.BlockPos.y > enemy.BlockPos.y)
                         {
+                            //ブロック判定
+                            bool isBlock = false;
+                            for (int nCnt = 1; nCnt < player.BlockPos.y - enemy.BlockPos.y; nCnt++)
+                            {
+                                if (StageData[(int)player.BlockPos.y - nCnt, (int)player.BlockPos.x] == 1)
+                                {
+                                    isBlock = true;
+                                    break;
+                                }
+                            }
+                            if (isBlock == true)
+                            {
+                                continue;
+                            }
 
                             //向き合っているか
                             if (Dir[enemy.ActorId] == Common.MOVE_TYPE.UP)
@@ -184,6 +349,20 @@ namespace Ateam
                         //右に敵
                         if (player.BlockPos.x < enemy.BlockPos.x)
                         {
+                            //ブロック判定
+                            bool isBlock = false;
+                            for (int nCnt = 1; nCnt < enemy.BlockPos.x - player.BlockPos.x; nCnt++)
+                            {
+                                if (StageData[(int)player.BlockPos.y, (int)player.BlockPos.x + nCnt] == 1)
+                                {
+                                    isBlock = true;
+                                    break;
+                                }
+                            }
+                            if (isBlock == true)
+                            {
+                                continue;
+                            }
 
                             //向き合っているか
                             if (Dir[enemy.ActorId] == Common.MOVE_TYPE.LEFT)
@@ -206,6 +385,20 @@ namespace Ateam
                         //左に敵
                         if (player.BlockPos.x > enemy.BlockPos.x)
                         {
+                            //ブロック判定
+                            bool isBlock = false;
+                            for (int nCnt = 1; nCnt < player.BlockPos.x - enemy.BlockPos.x; nCnt++)
+                            {
+                                if (StageData[(int)player.BlockPos.y, (int)player.BlockPos.x - nCnt] == 1)
+                                {
+                                    isBlock = true;
+                                    break;
+                                }
+                            }
+                            if (isBlock == true)
+                            {
+                                continue;
+                            }
 
                             //向き合っているか
                             if (Dir[enemy.ActorId] == Common.MOVE_TYPE.RIGHT)
@@ -262,7 +455,7 @@ namespace Ateam
                             {
                                 Move(player.ActorId, Common.MOVE_TYPE.RIGHT);
                             }
-                            else if ((int)player.BlockPos.x - 1 < -1 && StageData[(int)player.BlockPos.y, (int)player.BlockPos.x - 1] == 0)
+                            else if ((int)player.BlockPos.x - 1 > -1 && StageData[(int)player.BlockPos.y, (int)player.BlockPos.x - 1] == 0)
                             {
                                 Move(player.ActorId, Common.MOVE_TYPE.LEFT);
                             }
@@ -283,11 +476,11 @@ namespace Ateam
                             {
                                 Move(player.ActorId, Common.MOVE_TYPE.RIGHT);
                             }
-                            else if ((int)player.BlockPos.x - 1 < -1 && StageData[(int)player.BlockPos.y, (int)player.BlockPos.x - 1] == 0)
+                            else if ((int)player.BlockPos.x - 1 > -1 && StageData[(int)player.BlockPos.y, (int)player.BlockPos.x - 1] == 0)
                             {
                                 Move(player.ActorId, Common.MOVE_TYPE.LEFT);
                             }
-                            else if ((int)player.BlockPos.y - 1 < -1 && StageData[(int)player.BlockPos.y - 1, (int)player.BlockPos.x] == 0)
+                            else if ((int)player.BlockPos.y - 1 > -1 && StageData[(int)player.BlockPos.y - 1, (int)player.BlockPos.x] == 0)
                             {
                                 Move(player.ActorId, Common.MOVE_TYPE.DOWN);
                             }
@@ -304,11 +497,11 @@ namespace Ateam
                             {
                                 Move(player.ActorId, Common.MOVE_TYPE.UP);
                             }
-                            else if ((int)player.BlockPos.y - 1 < -1 && StageData[(int)player.BlockPos.y - 1, (int)player.BlockPos.x] == 0)
+                            else if ((int)player.BlockPos.y - 1 > -1 && StageData[(int)player.BlockPos.y - 1, (int)player.BlockPos.x] == 0)
                             {
                                 Move(player.ActorId, Common.MOVE_TYPE.DOWN);
                             }
-                            else if ((int)player.BlockPos.x - 1 < -1 && StageData[(int)player.BlockPos.y, (int)player.BlockPos.x - 1] == 0)
+                            else if ((int)player.BlockPos.x - 1 > -1 && StageData[(int)player.BlockPos.y, (int)player.BlockPos.x - 1] == 0)
                             {
                                 Move(player.ActorId, Common.MOVE_TYPE.LEFT);
                             }
@@ -325,7 +518,7 @@ namespace Ateam
                             {
                                 Move(player.ActorId, Common.MOVE_TYPE.UP);
                             }
-                            else if ((int)player.BlockPos.y - 1 < -1 && StageData[(int)player.BlockPos.y - 1, (int)player.BlockPos.x] == 0)
+                            else if ((int)player.BlockPos.y - 1 > -1 && StageData[(int)player.BlockPos.y - 1, (int)player.BlockPos.x] == 0)
                             {
                                 Move(player.ActorId, Common.MOVE_TYPE.DOWN);
                             }
@@ -366,13 +559,13 @@ namespace Ateam
 
                         }
 
-                        else if (player.BlockPos.x < enemyPos.x && (int)player.BlockPos.x + 1 < 15 &&
+                        else if (player.BlockPos.x < enemyPos.x && (int)player.BlockPos.x + 1< 15 &&
                             StageData[(int)player.BlockPos.y, (int)player.BlockPos.x + 1] == 0)
                         {
                             Move(player.ActorId, Common.MOVE_TYPE.RIGHT);
                         }
 
-                        else if (player.BlockPos.x > enemyPos.x && (int)player.BlockPos.x - 1 < -1 &&
+                        else if (player.BlockPos.x > enemyPos.x && (int)player.BlockPos.x - 1 > -1 &&
                             StageData[(int)player.BlockPos.y, (int)player.BlockPos.x - 1] == 0)
                         {
                             Move(player.ActorId, Common.MOVE_TYPE.LEFT);
@@ -385,7 +578,7 @@ namespace Ateam
                             Move(player.ActorId, Common.MOVE_TYPE.RIGHT);
                         }
 
-                        else if ((int)player.BlockPos.x - 1 < -1 &&
+                        else if ((int)player.BlockPos.x - 1 > -1 &&
                             StageData[(int)player.BlockPos.y, (int)player.BlockPos.x - 1] == 0)
                         {
                             Move(player.ActorId, Common.MOVE_TYPE.LEFT);
@@ -431,7 +624,7 @@ namespace Ateam
         //---------------------------------------------------
         override public void ItemSpawnCallback(ItemSpawnData itemData)
         {
-
+            ItemPos.Add(itemData.BlockPos);
         }
 
         
