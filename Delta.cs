@@ -118,6 +118,8 @@ namespace Ateam
                 bool bAttack = false;
                 int DangerEnemy = -1;
 
+
+
                 foreach (var enemy in EnemyDataList)
                 {
                     //èdÇ»ÇË
@@ -253,68 +255,153 @@ namespace Ateam
                     //Ç…Ç∞ÇÈ
                     if(DangerEnemy != -1)
                     {
-
-                    }
-
-
-                    else
-                    {
-
-                    }
-
-                    Vector2 enemyPos = new Vector2();       //à⁄ìÆëŒè€ÇÃà íu
-                    foreach( var enemy in EnemyDataList)
-                    {
-                        if( enemy.Hp > 0)
+                        //â∫Ç©ÇÁ
+                        if (Dir[DangerEnemy] == Common.MOVE_TYPE.UP)
                         {
-                            enemyPos = enemy.BlockPos;
-                            break;
+                            if ((int)player.BlockPos.x + 1 < 15 && StageData[(int)player.BlockPos.y, (int)player.BlockPos.x + 1] == 0)
+                            {
+                                Move(player.ActorId, Common.MOVE_TYPE.RIGHT);
+                            }
+                            else if ((int)player.BlockPos.x - 1 < -1 && StageData[(int)player.BlockPos.y, (int)player.BlockPos.x - 1] == 0)
+                            {
+                                Move(player.ActorId, Common.MOVE_TYPE.LEFT);
+                            }
+                            else if ((int)player.BlockPos.y + 1 < 15 && StageData[(int)player.BlockPos.y + 1, (int)player.BlockPos.x] == 0)
+                            {
+                                Move(player.ActorId, Common.MOVE_TYPE.UP);
+                            }
+                            else
+                            {
+                                Move(player.ActorId, Common.MOVE_TYPE.DOWN);
+                            }
+                        }
+
+                        //è„Ç©ÇÁ
+                        if (Dir[DangerEnemy] == Common.MOVE_TYPE.DOWN)
+                        {
+                            if ((int)player.BlockPos.x + 1 < 15 && StageData[(int)player.BlockPos.y, (int)player.BlockPos.x + 1] == 0)
+                            {
+                                Move(player.ActorId, Common.MOVE_TYPE.RIGHT);
+                            }
+                            else if ((int)player.BlockPos.x - 1 < -1 && StageData[(int)player.BlockPos.y, (int)player.BlockPos.x - 1] == 0)
+                            {
+                                Move(player.ActorId, Common.MOVE_TYPE.LEFT);
+                            }
+                            else if ((int)player.BlockPos.y - 1 < -1 && StageData[(int)player.BlockPos.y - 1, (int)player.BlockPos.x] == 0)
+                            {
+                                Move(player.ActorId, Common.MOVE_TYPE.DOWN);
+                            }
+                            else
+                            {
+                                Move(player.ActorId, Common.MOVE_TYPE.UP);
+                            }
+                        }
+
+                        //âEÇ©ÇÁ
+                        if (Dir[DangerEnemy] == Common.MOVE_TYPE.LEFT)
+                        {
+                            if ((int)player.BlockPos.y + 1 < 15 && StageData[(int)player.BlockPos.y + 1, (int)player.BlockPos.x] == 0)
+                            {
+                                Move(player.ActorId, Common.MOVE_TYPE.UP);
+                            }
+                            else if ((int)player.BlockPos.y - 1 < -1 && StageData[(int)player.BlockPos.y - 1, (int)player.BlockPos.x] == 0)
+                            {
+                                Move(player.ActorId, Common.MOVE_TYPE.DOWN);
+                            }
+                            else if ((int)player.BlockPos.x - 1 < -1 && StageData[(int)player.BlockPos.y, (int)player.BlockPos.x - 1] == 0)
+                            {
+                                Move(player.ActorId, Common.MOVE_TYPE.LEFT);
+                            }
+                            else
+                            {
+                                Move(player.ActorId, Common.MOVE_TYPE.RIGHT);
+                            }
+                        }
+
+                        //ç∂Ç©ÇÁ
+                        if (Dir[DangerEnemy] == Common.MOVE_TYPE.RIGHT)
+                        {
+                            if ((int)player.BlockPos.y + 1 < 15 && StageData[(int)player.BlockPos.y + 1, (int)player.BlockPos.x] == 0)
+                            {
+                                Move(player.ActorId, Common.MOVE_TYPE.UP);
+                            }
+                            else if ((int)player.BlockPos.y - 1 < -1 && StageData[(int)player.BlockPos.y - 1, (int)player.BlockPos.x] == 0)
+                            {
+                                Move(player.ActorId, Common.MOVE_TYPE.DOWN);
+                            }
+                            else if ((int)player.BlockPos.x + 1 < 15 && StageData[(int)player.BlockPos.y, (int)player.BlockPos.x + 1] == 0)
+                            {
+                                Move(player.ActorId, Common.MOVE_TYPE.RIGHT);
+                            }
+                            else
+                            {
+                                Move(player.ActorId, Common.MOVE_TYPE.LEFT);
+                            }
                         }
                     }
 
-                    //ç≈íZãóó£
-                    if (player.BlockPos.y < enemyPos.y &&
-                        StageData[(int)player.BlockPos.y + 1, (int)player.BlockPos.x] == 0)
+                    //çUåÇëŒè€Ç…å¸ÇØÇƒà⁄ìÆ
+                    else
                     {
-                        Move(player.ActorId, Common.MOVE_TYPE.UP);
-                    }
-                    else if (player.BlockPos.y > enemyPos.y &&
-                        StageData[(int)player.BlockPos.y - 1, (int)player.BlockPos.x] == 0)
-                    {
-                        Move(player.ActorId, Common.MOVE_TYPE.DOWN);
+                        Vector2 enemyPos = new Vector2();       //à⁄ìÆëŒè€ÇÃà íu
+                        foreach (var enemy in EnemyDataList)
+                        {
+                            if (enemy.Hp > 0)
+                            {
+                                enemyPos = enemy.BlockPos;
+                                break;
+                            }
+                        }
 
-                    }
+                        //ç≈íZãóó£
+                        if (player.BlockPos.y < enemyPos.y && (int)player.BlockPos.y + 1 < 15 &&
+                            StageData[(int)player.BlockPos.y + 1, (int)player.BlockPos.x] == 0)
+                        {
+                            Move(player.ActorId, Common.MOVE_TYPE.UP);
+                        }
+                        else if (player.BlockPos.y > enemyPos.y && (int)player.BlockPos.y - 1 > -1 &&
+                            StageData[(int)player.BlockPos.y - 1, (int)player.BlockPos.x] == 0)
+                        {
+                            Move(player.ActorId, Common.MOVE_TYPE.DOWN);
 
-                    else if (player.BlockPos.x < enemyPos.x &&
-                        StageData[(int)player.BlockPos.y, (int)player.BlockPos.x + 1] == 0)
-                    {
-                        Move(player.ActorId, Common.MOVE_TYPE.RIGHT);
-                    }
+                        }
 
-                    else if (player.BlockPos.x > enemyPos.x &&
-                        StageData[(int)player.BlockPos.y, (int)player.BlockPos.x - 1] == 0)
-                    {
-                        Move(player.ActorId, Common.MOVE_TYPE.LEFT);
-                    }
+                        else if (player.BlockPos.x < enemyPos.x && (int)player.BlockPos.x + 1 < 15 &&
+                            StageData[(int)player.BlockPos.y, (int)player.BlockPos.x + 1] == 0)
+                        {
+                            Move(player.ActorId, Common.MOVE_TYPE.RIGHT);
+                        }
 
-                    //âìâÒÇË
-                    else if (StageData[(int)player.BlockPos.y + 1, (int)player.BlockPos.x] == 0)
-                    {
-                        Move(player.ActorId, Common.MOVE_TYPE.UP);
-                    }
-                    else if (StageData[(int)player.BlockPos.y - 1, (int)player.BlockPos.x] == 0)
-                    {
-                        Move(player.ActorId, Common.MOVE_TYPE.DOWN);
-                    }
+                        else if (player.BlockPos.x > enemyPos.x && (int)player.BlockPos.x - 1 < -1 &&
+                            StageData[(int)player.BlockPos.y, (int)player.BlockPos.x - 1] == 0)
+                        {
+                            Move(player.ActorId, Common.MOVE_TYPE.LEFT);
+                        }
 
-                    else if (StageData[(int)player.BlockPos.y, (int)player.BlockPos.x + 1] == 0)
-                    {
-                        Move(player.ActorId, Common.MOVE_TYPE.RIGHT);
-                    }
+                        //âìâÒÇË
+                        else if ((int)player.BlockPos.x + 1 < 15 &&
+                            StageData[(int)player.BlockPos.y, (int)player.BlockPos.x + 1] == 0)
+                        {
+                            Move(player.ActorId, Common.MOVE_TYPE.RIGHT);
+                        }
 
-                    else if (StageData[(int)player.BlockPos.y, (int)player.BlockPos.x - 1] == 0)
-                    {
-                        Move(player.ActorId, Common.MOVE_TYPE.LEFT);
+                        else if ((int)player.BlockPos.x - 1 < -1 &&
+                            StageData[(int)player.BlockPos.y, (int)player.BlockPos.x - 1] == 0)
+                        {
+                            Move(player.ActorId, Common.MOVE_TYPE.LEFT);
+                        }
+                        else if ((int)player.BlockPos.y + 1 < 15 &&
+                            StageData[(int)player.BlockPos.y + 1, (int)player.BlockPos.x] == 0)
+                        {
+                            Move(player.ActorId, Common.MOVE_TYPE.UP);
+                        }
+                        else if ((int)player.BlockPos.y - 1 > -1 &&
+                            StageData[(int)player.BlockPos.y - 1, (int)player.BlockPos.x] == 0)
+                        {
+                            Move(player.ActorId, Common.MOVE_TYPE.DOWN);
+                        }
+
+                        
                     }
 
 
