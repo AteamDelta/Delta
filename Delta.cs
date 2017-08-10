@@ -177,27 +177,26 @@ namespace Ateam
                         Move(player.ActorId, Common.MOVE_TYPE.LEFT);
                     }
 
-                    //‰“‰ñ‚è
-                    else if ((int)player.BlockPos.x + 1 < 15 &&
-                        StageData[(int)player.BlockPos.y, (int)player.BlockPos.x + 1] == 0)
+                    //ƒ‰ƒ“ƒ_ƒ€
+                    else
                     {
-                        Move(player.ActorId, Common.MOVE_TYPE.RIGHT);
-                    }
-
-                    else if ((int)player.BlockPos.x - 1 > -1 &&
-                        StageData[(int)player.BlockPos.y, (int)player.BlockPos.x - 1] == 0)
-                    {
-                        Move(player.ActorId, Common.MOVE_TYPE.LEFT);
-                    }
-                    else if ((int)player.BlockPos.y + 1 < 15 &&
-                        StageData[(int)player.BlockPos.y + 1, (int)player.BlockPos.x] == 0)
-                    {
-                        Move(player.ActorId, Common.MOVE_TYPE.UP);
-                    }
-                    else if ((int)player.BlockPos.y - 1 > -1 &&
-                        StageData[(int)player.BlockPos.y - 1, (int)player.BlockPos.x] == 0)
-                    {
-                        Move(player.ActorId, Common.MOVE_TYPE.DOWN);
+                        var rand = Random.Range(0, 4);
+                        if (rand == 0)
+                        {
+                            Move(player.ActorId, Common.MOVE_TYPE.UP);
+                        }
+                        if (rand == 1)
+                        {
+                            Move(player.ActorId, Common.MOVE_TYPE.DOWN);
+                        }
+                        if (rand == 2)
+                        {
+                            Move(player.ActorId, Common.MOVE_TYPE.RIGHT);
+                        }
+                        if (rand == 3)
+                        {
+                            Move(player.ActorId, Common.MOVE_TYPE.LEFT);
+                        }
                     }
                 }
 
@@ -571,30 +570,52 @@ namespace Ateam
                             Move(player.ActorId, Common.MOVE_TYPE.LEFT);
                         }
 
+                        //ƒ‰ƒ“ƒ_ƒ€
+                        else
+                        {
+                            var rand = Random.Range(0, 4);
+                            if (rand == 0)
+                            {
+                                Move(player.ActorId, Common.MOVE_TYPE.UP);
+                            }
+                            if (rand == 1)
+                            {
+                                Move(player.ActorId, Common.MOVE_TYPE.DOWN);
+                            }
+                            if (rand == 2)
+                            {
+                                Move(player.ActorId, Common.MOVE_TYPE.RIGHT);
+                            }
+                            if (rand == 3)
+                            {
+                                Move(player.ActorId, Common.MOVE_TYPE.LEFT);
+                            }
+                        }
+
                         //‰“‰ñ‚è
-                        else if ((int)player.BlockPos.x + 1 < 15 &&
-                            StageData[(int)player.BlockPos.y, (int)player.BlockPos.x + 1] == 0)
-                        {
-                            Move(player.ActorId, Common.MOVE_TYPE.RIGHT);
-                        }
+                        //else if ((int)player.BlockPos.x + 1 < 15 &&
+                        //    StageData[(int)player.BlockPos.y, (int)player.BlockPos.x + 1] == 0)
+                        //{
+                        //    Move(player.ActorId, Common.MOVE_TYPE.RIGHT);
+                        //}
 
-                        else if ((int)player.BlockPos.x - 1 > -1 &&
-                            StageData[(int)player.BlockPos.y, (int)player.BlockPos.x - 1] == 0)
-                        {
-                            Move(player.ActorId, Common.MOVE_TYPE.LEFT);
-                        }
-                        else if ((int)player.BlockPos.y + 1 < 15 &&
-                            StageData[(int)player.BlockPos.y + 1, (int)player.BlockPos.x] == 0)
-                        {
-                            Move(player.ActorId, Common.MOVE_TYPE.UP);
-                        }
-                        else if ((int)player.BlockPos.y - 1 > -1 &&
-                            StageData[(int)player.BlockPos.y - 1, (int)player.BlockPos.x] == 0)
-                        {
-                            Move(player.ActorId, Common.MOVE_TYPE.DOWN);
-                        }
+                        //else if ((int)player.BlockPos.x - 1 > -1 &&
+                        //    StageData[(int)player.BlockPos.y, (int)player.BlockPos.x - 1] == 0)
+                        //{
+                        //    Move(player.ActorId, Common.MOVE_TYPE.LEFT);
+                        //}
+                        //else if ((int)player.BlockPos.y + 1 < 15 &&
+                        //    StageData[(int)player.BlockPos.y + 1, (int)player.BlockPos.x] == 0)
+                        //{
+                        //    Move(player.ActorId, Common.MOVE_TYPE.UP);
+                        //}
+                        //else if ((int)player.BlockPos.y - 1 > -1 &&
+                        //    StageData[(int)player.BlockPos.y - 1, (int)player.BlockPos.x] == 0)
+                        //{
+                        //    Move(player.ActorId, Common.MOVE_TYPE.DOWN);
+                        //}
 
-                        
+
                     }
 
 
